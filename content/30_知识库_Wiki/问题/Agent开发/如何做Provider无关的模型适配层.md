@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-06-26
-updated: 2026-06-26
 aliases:
   - Provider无关模型适配层设计题
   - Provider Adapter设计题

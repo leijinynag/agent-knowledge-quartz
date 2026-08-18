@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-06-26
-updated: 2026-07-15
 aliases:
   - Event-driven Agent Runtime
   - RuntimeEvent
@@ -25,6 +24,53 @@ confidence: medium
 - UI 只负责消费事件并渲染，不重新实现 Agent loop。
 - 日志和回放也可以基于同一事件协议。
 
+## Runtime 的输入输出
+
+输入不是一段字符串，而是任务合同和依赖：
+
+```ts
+run({
+  task,
+  checkpoint,
+  modelGateway,
+  toolRegistry,
+  policy,
+  eventSink,
+  signal
+}): AsyncIterable<RuntimeEvent>
+```
+
+输出事件既服务实时 UI，也写入持久化日志。业务状态由事件驱动更新，但最终快照仍应保存为 checkpoint。
+
+## 事件粒度
+
+粒度过粗时无法解释失败，过细时日志和前端压力过大。通常需要记录状态边界和有业务意义的增量：
+
+- 文本可以按较小批次合并后发送。
+- 工具参数只在需要实时预览时发送增量。
+- 每次工具状态迁移必须记录。
+- token 级内部推理不应默认进入业务日志。
+
+## 顺序与背压
+
+- 每个任务维护单调递增序号。
+- 消费方按事件 ID 去重。
+- 持久化慢时需要缓冲和上限。
+- UI 断线后可从最后序号续传。
+- 用户取消通过 `AbortSignal` 传播到模型和工具。
+
+## 错误状态
+
+错误事件至少区分 Provider、工具、权限、上下文、预算和内部状态错误。Runtime 根据错误类型决定重试、重规划、等待用户、降级或终止，而不是统一抛出异常结束进程。
+
+## UI 解耦
+
+CLI、Web 和移动端可以用不同方式呈现同一事件：
+
+- `tool.requested` 在 CLI 显示一行，在 Web 显示确认面板。
+- `text.delta` 在终端直接追加，在 Web 进入 Markdown 缓冲。
+- `task.waiting` 可以触发通知，而不是保持请求挂起。
+
 ## 在 Velaire 中的体现
 
 Velaire 的 CLI/TUI、React Web Workbench、JSONL run log 和测试都围绕 RuntimeEvent 工作。这样可以保证同一个 Agent 核心在不同界面下行为一致。
@@ -46,3 +92,5 @@ Velaire 的 CLI/TUI、React Web Workbench、JSONL run log 和测试都围绕 Run
 
 - [[30_知识库_Wiki/概念/Agent开发/Agent可观测性与RuntimeEvent]]
 - [[30_知识库_Wiki/主题/Agent开发/Agent系统设计]]
+- [[30_知识库_Wiki/概念/Agent开发/Agent状态管理与Checkpoint]]
+- [[30_知识库_Wiki/概念/Agent开发/SSE流式Agent状态同步]]

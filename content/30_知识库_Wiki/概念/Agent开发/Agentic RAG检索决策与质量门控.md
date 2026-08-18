@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-08-12
-updated: 2026-08-12
 aliases:
   - Agentic RAG
   - Agent检索决策

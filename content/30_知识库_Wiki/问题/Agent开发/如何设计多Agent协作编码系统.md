@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-06-26
-updated: 2026-06-26
 aliases:
   - 多Agent编码系统设计题
 tags:

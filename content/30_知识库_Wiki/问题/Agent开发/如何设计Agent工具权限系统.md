@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-06-26
-updated: 2026-06-26
 aliases:
   - Agent工具权限设计题
 tags:

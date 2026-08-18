@@ -2,7 +2,6 @@
 type: wiki
 status: generated
 created: 2026-08-12
-updated: 2026-08-12
 aliases:
   - Agent Tool Result UI
   - Agent工具结果展示
